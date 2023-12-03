@@ -58,7 +58,7 @@ def is_game_valid(game: Game) -> bool:
 data_path = Path(__file__).with_name("prompt.txt")
 file_text = data_path.read_text()
 games = get_games(file_text)
-valid_games = filter(is_game_valid, games)
-sum_of_ids = reduce(lambda acc, next_game: acc + next_game[0], valid_games, 0)
+valid_game_ids = [game[0] for game in games if is_game_valid(game)]
+sum_of_ids = reduce(lambda acc, game_id: acc + game_id, valid_game_ids, 0)
 
 print(sum_of_ids)
