@@ -44,7 +44,7 @@ def get_games(input: str) -> Iterable[Game]:
 def hand_is_valid(hand: Hand) -> bool:
     if hand["red"] > MAX_RED:
         return False
-    if hand["green"] > MAX_RED:
+    if hand["green"] > MAX_GREEN:
         return False
     if hand["blue"] > MAX_BLUE:
         return False
