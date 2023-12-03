@@ -24,20 +24,20 @@ def get_hand_details(hand: str) -> Hand:
     return {"red": int(red), "green": int(green), "blue": int(blue)}
 
 
-def get_game_details(input: str) -> Game:
-    game_number = re.search(r"([0-9]+):", input)
-    assert game_number is not None
+def get_game_details(index: int, input: str) -> Game:
     game_result = re.search(r": (.*)", input)
     assert game_result is not None
     all_hands: str = game_result.group(1)
     individual_hands = all_hands.split(";")
-    hand_details = map(get_hand_details, individual_hands)
-    return (int(game_number.group(1)), list(hand_details))
+    hand_details = [get_hand_details(hand) for hand in individual_hands]
+    return (index + 1, hand_details)
 
 
 def get_games(input: str) -> Iterable[Game]:
     game_lines: list[str] = input.splitlines()
-    game_details = map(get_game_details, game_lines)
+    game_details = [
+        get_game_details(index, line) for index, line in enumerate(game_lines)
+    ]
     return game_details
 
 
