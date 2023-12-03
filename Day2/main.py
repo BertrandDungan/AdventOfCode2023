@@ -11,8 +11,6 @@ MAX_RED = 12
 MAX_GREEN = 13
 MAX_BLUE = 14
 
-MAX_CUBES = MAX_RED + MAX_GREEN + MAX_BLUE
-
 
 def get_hand_details(hand: str) -> Hand:
     red_search = re.search(r"([0-9]+) r", hand)
@@ -50,8 +48,6 @@ def hand_is_valid(hand: Hand) -> bool:
         return False
     if hand["blue"] > MAX_BLUE:
         return False
-    if (hand["red"] + hand["green"] + hand["blue"]) > MAX_CUBES:
-        return False
     return True
 
 
@@ -59,7 +55,7 @@ def is_game_valid(game: Game) -> bool:
     return all(hand_is_valid(hand) for hand in game[1])
 
 
-data_path = Path(__file__).with_name("test.txt")
+data_path = Path(__file__).with_name("prompt.txt")
 file_text = data_path.read_text()
 games = get_games(file_text)
 valid_games = filter(is_game_valid, games)
