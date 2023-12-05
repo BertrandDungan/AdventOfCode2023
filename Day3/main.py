@@ -24,32 +24,37 @@ for line_index, line in enumerate(file_lines):
             current_number = []
         elif character.isdigit():
             current_number.append(character)
-            if line_index > 0:
-                char_n = file_lines[line_index - 1][character_index]
-                if is_part(char_n):
-                    is_part_number = True
-                if character_index > 0:
-                    char_nw = file_lines[line_index - 1][character_index - 1]
-                    if is_part(char_nw):
+            if is_part_number is not True:
+                if line_index > 0:
+                    char_n = file_lines[line_index - 1][character_index]
+                    if is_part(char_n):
                         is_part_number = True
-                if character_index < line_length - 1:
-                    char_ne = file_lines[line_index - 1][character_index + 1]
-                    if is_part(char_ne):
+                    if character_index > 0:
+                        char_nw = file_lines[line_index - 1][character_index - 1]
+                        if is_part(char_nw):
+                            is_part_number = True
+                    if character_index < line_length - 1:
+                        char_ne = file_lines[line_index - 1][character_index + 1]
+                        if is_part(char_ne):
+                            is_part_number = True
+                if line_index < max_lines - 1:
+                    char_s = file_lines[line_index + 1][character_index]
+                    if is_part(char_s):
                         is_part_number = True
-            if line_index < max_lines - 1:
-                char_s = file_lines[line_index + 1][character_index]
-                if is_part(char_s):
-                    is_part_number = True
-                if character_index > 0:
-                    char_sw = file_lines[line_index + 1][character_index - 1]
-                    if is_part(char_sw):
-                        is_part_number = True
-                if character_index < line_length - 1:
-                    char_se = file_lines[line_index + 1][character_index + 1]
-                    if is_part(char_se):
-                        is_part_number = True
+                    if character_index > 0:
+                        char_sw = file_lines[line_index + 1][character_index - 1]
+                        if is_part(char_sw):
+                            is_part_number = True
+                    if character_index < line_length - 1:
+                        char_se = file_lines[line_index + 1][character_index + 1]
+                        if is_part(char_se):
+                            is_part_number = True
         else:
             is_part_number = True
+            if len(current_number) > 0:
+                full_number = "".join(current_number)
+                part_sum += int(full_number)
+                current_number = []
 
     if is_part_number and len(current_number) > 0:
         full_number = "".join(current_number)
