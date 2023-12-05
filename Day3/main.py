@@ -5,6 +5,38 @@ def is_part(char: str) -> bool:
     return char != "." and not char.isdigit()
 
 
+def get_number(number_buffer: list[str]) -> int:
+    return int("".join(number_buffer))
+
+
+def check_for_parts(file_lines, line_index, character_index) -> bool:
+    if line_index > 0:
+        char_n = file_lines[line_index - 1][character_index]
+        if is_part(char_n):
+            return True
+        if character_index > 0:
+            char_nw = file_lines[line_index - 1][character_index - 1]
+            if is_part(char_nw):
+                return True
+        if character_index < line_length - 1:
+            char_ne = file_lines[line_index - 1][character_index + 1]
+            if is_part(char_ne):
+                return True
+    if line_index < max_lines - 1:
+        char_s = file_lines[line_index + 1][character_index]
+        if is_part(char_s):
+            return True
+        if character_index > 0:
+            char_sw = file_lines[line_index + 1][character_index - 1]
+            if is_part(char_sw):
+                return True
+        if character_index < line_length - 1:
+            char_se = file_lines[line_index + 1][character_index + 1]
+            if is_part(char_se):
+                return True
+    return False
+
+
 data_path = Path(__file__).with_name("prompt.txt")
 file_text = data_path.read_text()
 file_lines = file_text.splitlines()
@@ -13,51 +45,28 @@ line_length = len(file_lines[0])
 
 part_sum = 0
 for line_index, line in enumerate(file_lines):
-    current_number: list[str] = []
+    number_buffer: list[str] = []
     is_part_number = False
     for character_index, character in enumerate(line):
         if character == ".":
-            if is_part_number and len(current_number) > 0:
-                full_number = "".join(current_number)
-                part_sum += int(full_number)
+            if is_part_number and len(number_buffer) > 0:
+                part_sum += get_number(number_buffer)
             is_part_number = False
-            current_number = []
+            number_buffer = []
         elif character.isdigit():
-            current_number.append(character)
+            number_buffer.append(character)
             if is_part_number is not True:
-                if line_index > 0:
-                    char_n = file_lines[line_index - 1][character_index]
-                    if is_part(char_n):
-                        is_part_number = True
-                    if character_index > 0:
-                        char_nw = file_lines[line_index - 1][character_index - 1]
-                        if is_part(char_nw):
-                            is_part_number = True
-                    if character_index < line_length - 1:
-                        char_ne = file_lines[line_index - 1][character_index + 1]
-                        if is_part(char_ne):
-                            is_part_number = True
-                if line_index < max_lines - 1:
-                    char_s = file_lines[line_index + 1][character_index]
-                    if is_part(char_s):
-                        is_part_number = True
-                    if character_index > 0:
-                        char_sw = file_lines[line_index + 1][character_index - 1]
-                        if is_part(char_sw):
-                            is_part_number = True
-                    if character_index < line_length - 1:
-                        char_se = file_lines[line_index + 1][character_index + 1]
-                        if is_part(char_se):
-                            is_part_number = True
+                is_part_number = check_for_parts(
+                    file_lines, line_index, character_index
+                )
+
         else:
             is_part_number = True
-            if len(current_number) > 0:
-                full_number = "".join(current_number)
-                part_sum += int(full_number)
-                current_number = []
+            if len(number_buffer) > 0:
+                part_sum += get_number(number_buffer)
+                number_buffer = []
 
-    if is_part_number and len(current_number) > 0:
-        full_number = "".join(current_number)
-        part_sum += int(full_number)
+    if is_part_number and len(number_buffer) > 0:
+        part_sum += get_number(number_buffer)
 
 print(part_sum)
