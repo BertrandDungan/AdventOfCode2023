@@ -77,7 +77,7 @@ def check_for_gear_parts(
     return (False, "")
 
 
-data_path = Path(__file__).with_name("test.txt")
+data_path = Path(__file__).with_name("prompt.txt")
 file_text = data_path.read_text()
 file_lines = file_text.splitlines()
 max_lines = len(file_lines)
