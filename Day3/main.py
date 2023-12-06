@@ -13,6 +13,10 @@ def get_number(number_buffer: list[str]) -> int:
     return int("".join(number_buffer))
 
 
+def get_gear_identifier(line_index: int, character_index: int) -> str:
+    return f"{line_index},{character_index}"
+
+
 def check_for_parts(
     file_lines: list[str], line_index: int, character_index: int
 ) -> bool:
@@ -41,10 +45,6 @@ def check_for_parts(
             if is_part(char_se):
                 return True
     return False
-
-
-def get_gear_identifier(line_index: int, character_index: int) -> str:
-    return f"{line_index},{character_index}"
 
 
 def check_for_gear_parts(
