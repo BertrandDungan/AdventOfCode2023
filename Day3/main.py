@@ -53,7 +53,7 @@ def check_for_gear_parts(
     if line_index > 0:
         char_n = file_lines[line_index - 1][character_index]
         if is_gear(char_n):
-            return (True, get_gear_identifier(line_index, character_index - 1))
+            return (True, get_gear_identifier(line_index - 1, character_index))
         if character_index > 0:
             char_nw = file_lines[line_index - 1][character_index - 1]
             if is_gear(char_nw):
