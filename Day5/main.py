@@ -2,6 +2,7 @@ from typing import NamedTuple
 from itertools import batched
 from pathlib import Path
 from re import search, Pattern, compile
+from itertools import chain
 
 
 class Mapping(NamedTuple):
@@ -27,7 +28,12 @@ def find_numbers(text: str, pattern: Pattern) -> list[int]:
 
 
 def get_seeds(text: str) -> list[int]:
-    return find_numbers(text, SEEDS_REGEX)
+    all_seed_numbers = find_numbers(text, SEEDS_REGEX)
+    seed_pairs = batched(all_seed_numbers, 2)
+    unpacked_seeds = [
+        [*range(seed_pair[0], seed_pair[0] + seed_pair[1])] for seed_pair in seed_pairs
+    ]
+    return list(chain.from_iterable(unpacked_seeds))
 
 
 def get_mapping(text: str, pattern: Pattern) -> list[Mapping]:
@@ -50,7 +56,7 @@ def transform(source: int, transformations: list[Mapping]) -> int:
     return source
 
 
-data_path = Path(__file__).with_name("prompt.txt")
+data_path = Path(__file__).with_name("test.txt")
 file_text = data_path.read_text()
 
 seeds = get_seeds(file_text)
