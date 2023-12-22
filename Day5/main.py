@@ -2,7 +2,6 @@ from typing import NamedTuple
 from itertools import batched
 from pathlib import Path
 from re import search, Pattern, compile
-from itertools import chain
 
 
 class Mapping(NamedTuple):
@@ -11,22 +10,24 @@ class Mapping(NamedTuple):
     stop: int
 
 
-def find_numbers(text: str, pattern: Pattern) -> list[int]:
+class SeedRange(NamedTuple):
+    start: int
+    stop: int
+
+
+def find_numbers(text: str, pattern: Pattern) -> [int]:
     results = search(pattern, text)
     assert results is not None
     return [int(result) for result in results.group(1).split()]
 
 
-def get_seeds(text: str) -> list[int]:
+def get_seeds(text: str) -> [SeedRange]:
     all_seed_numbers = find_numbers(text, compile(r"seeds: ([0-9 ]+)\n"))
     seed_pairs = batched(all_seed_numbers, 2)
-    unpacked_seeds = [
-        [*range(seed_pair[0], seed_pair[0] + seed_pair[1])] for seed_pair in seed_pairs
-    ]
-    return list(chain.from_iterable(unpacked_seeds))
+    return [SeedRange(pair[0], pair[1]) for pair in seed_pairs]
 
 
-def get_mapping(text: str, pattern: Pattern) -> list[Mapping]:
+def get_mapping(text: str, pattern: Pattern) -> [Mapping]:
     return [
         Mapping(group[0] - group[1], group[1], group[1] + group[2])
         for group in batched(find_numbers(text, pattern), 3)
@@ -37,7 +38,7 @@ def matching_range(source: int, transformation: Mapping) -> bool:
     return transformation.start <= source and transformation.stop >= source
 
 
-def transform(source: int, transformations: list[Mapping]) -> int:
+def transform(source: SeedRange, transformations: list[Mapping]) -> [SeedRange]:
     if any(
         matching_range(source, (matching_transformation := transformation))
         for transformation in transformations
