@@ -1,6 +1,14 @@
+from typing import NamedTuple
 from itertools import batched
 from pathlib import Path
 from re import search, Pattern, compile
+
+
+class Mapping(NamedTuple):
+    transformation: int
+    start: int
+    stop: int
+
 
 SEEDS_REGEX = compile(r"seeds: ([0-9 ]+)\n")
 SOIL_REGEX = compile(r"soil map:\n([0-9 \n]+)")
@@ -26,8 +34,24 @@ def get_seeds(text: str) -> list[int]:
     return find_numbers(text, SEEDS_REGEX)
 
 
-def get_mapping(text: str, pattern: Pattern) -> list[tuple[int, int, int]]:
-    return group_by_three(find_numbers(text, pattern))
+def get_mapping(text: str, pattern: Pattern) -> list[Mapping]:
+    groups = group_by_three(find_numbers(text, pattern))
+    return [
+        Mapping(group[0] - group[1], group[1], group[1] + group[2]) for group in groups
+    ]
+
+
+def matching_range(source: int, transformation: Mapping) -> bool:
+    return transformation.start <= source and transformation.stop >= source
+
+
+def transform(source: int, transformations: list[Mapping]) -> int:
+    if any(
+        matching_range(source, (matching_transformation := transformation))
+        for transformation in transformations
+    ):
+        return source + matching_transformation.transformation
+    return source
 
 
 data_path = Path(__file__).with_name("test.txt")
@@ -43,4 +67,16 @@ humidity_map = get_mapping(file_text, HUMIDITY_REGEX)
 location_map = get_mapping(file_text, LOCATION_REGEX)
 
 
-print(soil_map)
+soil_for_seeds = [transform(seed, soil_map) for seed in seeds]
+fertiliser_for_soil = [transform(seed, fertiliser_map) for seed in soil_for_seeds]
+water_for_fertiliser = [transform(seed, water_map) for seed in fertiliser_for_soil]
+light_for_water = [transform(seed, light_map) for seed in water_for_fertiliser]
+temperature_for_light = [transform(seed, temperature_map) for seed in light_for_water]
+humidity_for_temperature = [
+    transform(seed, humidity_map) for seed in temperature_for_light
+]
+location_for_humidity = [
+    transform(seed, location_map) for seed in humidity_for_temperature
+]
+
+print(location_for_humidity)
