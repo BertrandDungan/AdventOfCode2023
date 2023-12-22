@@ -20,10 +20,6 @@ HUMIDITY_REGEX = compile(r"humidity map:\n([0-9 \n]+)")
 LOCATION_REGEX = compile(r"location map:\n([0-9 \n]+)")
 
 
-def group_by_three(input: list[int]):
-    return list(batched(input, 3))
-
-
 def find_numbers(text: str, pattern: Pattern) -> list[int]:
     results = search(pattern, text)
     assert results is not None
@@ -35,9 +31,9 @@ def get_seeds(text: str) -> list[int]:
 
 
 def get_mapping(text: str, pattern: Pattern) -> list[Mapping]:
-    groups = group_by_three(find_numbers(text, pattern))
     return [
-        Mapping(group[0] - group[1], group[1], group[1] + group[2]) for group in groups
+        Mapping(group[0] - group[1], group[1], group[1] + group[2])
+        for group in batched(find_numbers(text, pattern), 3)
     ]
 
 
