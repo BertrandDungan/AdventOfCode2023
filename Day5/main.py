@@ -54,7 +54,7 @@ def transform(source: int, transformations: list[Mapping]) -> int:
     return source
 
 
-data_path = Path(__file__).with_name("test.txt")
+data_path = Path(__file__).with_name("prompt.txt")
 file_text = data_path.read_text()
 
 seeds = get_seeds(file_text)
@@ -65,7 +65,6 @@ light_map = get_mapping(file_text, LIGHT_REGEX)
 temperature_map = get_mapping(file_text, TEMPERATURE_REGEX)
 humidity_map = get_mapping(file_text, HUMIDITY_REGEX)
 location_map = get_mapping(file_text, LOCATION_REGEX)
-
 
 soil_for_seeds = [transform(seed, soil_map) for seed in seeds]
 fertiliser_for_soil = [transform(seed, fertiliser_map) for seed in soil_for_seeds]
@@ -79,4 +78,4 @@ location_for_humidity = [
     transform(seed, location_map) for seed in humidity_for_temperature
 ]
 
-print(location_for_humidity)
+print(min(location_for_humidity))
