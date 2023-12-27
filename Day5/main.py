@@ -35,13 +35,11 @@ def get_mapping(text: str, pattern: Pattern) -> list[Mapping]:
 
 
 def matching_range(source: SeedRange, transformation: Mapping) -> bool:
-    return transformation.start <= source.stop and transformation.stop >= source.start
+    return source.start >= transformation.start and source.stop <= transformation.stop
 
 
 def overlapping_range(source: SeedRange, transformation: Mapping) -> bool:
-    return (
-        transformation.start <= source.stop and transformation.stop >= source.stop
-    ) or (transformation.stop >= source.start and transformation.start <= source.start)
+    return source.start <= transformation.stop and transformation.start <= source.stop
 
 
 def transform(source: SeedRange, transformations: list[Mapping]) -> list[SeedRange]:
@@ -59,20 +57,33 @@ def transform(source: SeedRange, transformations: list[Mapping]) -> list[SeedRan
                 min(source.stop, matching_transformation.stop),
             )
 
-            transformed_range = [split_source]
+            transformed_range = [
+                SeedRange(
+                    split_source.start + matching_transformation.transformation,
+                    split_source.stop + matching_transformation.transformation,
+                )
+            ]
 
-            first_half = SeedRange(source.start, split_source.start)
-            if first_half.start != split_source.start:
+            first_half = SeedRange(source.start, split_source.start - 1)
+            if (
+                first_half.start != split_source.start
+                and first_half.stop != split_source.stop
+                and first_half.start <= first_half.stop
+            ):
                 transformed_range.extend(transform(first_half, transformations))
-            second_half = SeedRange(split_source.stop, source.stop)
-            if second_half.stop != split_source.stop:
+            second_half = SeedRange(split_source.stop + 1, source.stop)
+            if (
+                split_source.start != second_half.start
+                and second_half.stop != split_source.stop
+                and second_half.start <= second_half.stop
+            ):
                 transformed_range.extend(transform(second_half, transformations))
             return transformed_range
 
     return [source]
 
 
-data_path = Path(__file__).with_name("prompt.txt")
+data_path = Path(__file__).with_name("test.txt")
 file_text = data_path.read_text()
 
 seeds = get_seeds(file_text)
