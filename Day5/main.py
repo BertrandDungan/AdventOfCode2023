@@ -83,7 +83,7 @@ def transform(source: SeedRange, transformations: list[Mapping]) -> list[SeedRan
     return [source]
 
 
-data_path = Path(__file__).with_name("test.txt")
+data_path = Path(__file__).with_name("prompt.txt")
 file_text = data_path.read_text()
 
 seeds = get_seeds(file_text)
